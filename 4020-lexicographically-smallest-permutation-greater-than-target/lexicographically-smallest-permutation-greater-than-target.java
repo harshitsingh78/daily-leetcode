@@ -1,47 +1,68 @@
 class Solution {
     public String lexGreaterPermutation(String s, String target) {
         int n = s.length();
+
         int[] cnt = new int[26];
 
         for (char c : s.toCharArray()) {
             cnt[c - 'a']++;
         }
-        for (int i = n - 1; i >= 0; i--) {
 
-            int[] remain = cnt.clone();
+        StringBuilder prefix = new StringBuilder();
 
-            boolean possible = true;
+        for (int i = 0; i < n; i++) {
 
-            for (int j = 0; j < i; j++) {
-                int x = target.charAt(j) - 'a';
+            int x = target.charAt(i) - 'a';
 
-                if (remain[x] == 0) {
-                    possible = false;
-                    break;
-                }
-
-                remain[x]--;
+            if (cnt[x] == 0) {
+                break;
             }
 
-            if (!possible)
-                continue;
+            cnt[x]--;
+            prefix.append(target.charAt(i));
+        }
 
-            int targetChar = target.charAt(i) - 'a';
+        if (prefix.length() < n) {
+            int i = prefix.length();
+            int x = target.charAt(i) - 'a';
 
-            for (int c = targetChar + 1; c < 26; c++) {
-
-                if (remain[c] == 0)
+            for (int c = x + 1; c < 26; c++) {
+                if (cnt[c] == 0)
                     continue;
 
-                StringBuilder ans = new StringBuilder(target.substring(0, i));
-
+                StringBuilder ans = new StringBuilder(prefix);
                 ans.append((char) ('a' + c));
 
-                remain[c]--;
+                cnt[c]--;
 
-                for (int x = 0; x < 26; x++) {
-                    for (int t = 0; t < remain[x]; t++) {
-                        ans.append((char) ('a' + x));
+                for (int ch = 0; ch < 26; ch++) {
+                    for (int t = 0; t < cnt[ch]; t++) {
+                        ans.append((char) ('a' + ch));
+                    }
+                }
+
+                return ans.toString();
+            }
+        }
+        for (int i = prefix.length() - 1; i >= 0; i--) {
+
+            cnt[prefix.charAt(i) - 'a']++;
+
+            prefix.deleteCharAt(prefix.length() - 1);
+
+            int x = target.charAt(i) - 'a';
+            for (int c = x + 1; c < 26; c++) {
+
+                if (cnt[c] == 0)
+                    continue;
+
+                StringBuilder ans = new StringBuilder(prefix);
+                ans.append((char) ('a' + c));
+
+                cnt[c]--;
+                for (int ch = 0; ch < 26; ch++) {
+                    for (int t = 0; t < cnt[ch]; t++) {
+                        ans.append((char) ('a' + ch));
                     }
                 }
 
